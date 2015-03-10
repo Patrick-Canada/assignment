@@ -1,0 +1,12 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+
+    <string name="app_name">Assignment</string>
+    <string name="hello_world">Hello world!</string>
+    <string name="action_Images">images</string>
+    <string name="action_Camera">Camera</string>
+    <string name="action_Send">Send</string>
+    <string name="app_images">images</string>
+    <string name="send_fragment_tag">send_fragment_tag</string>
+    <string name="user_fragment_tag">user_fragment_tag</string>
+</resources>
