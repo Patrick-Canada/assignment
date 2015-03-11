@@ -38,8 +38,8 @@ public class SendFragment extends Fragment {
 
     public void showUserFragment(){
         UserFragment fragment=new UserFragment();
-        FragmentTransaction fragmentTransaction=getFragmentManager().beginTransaction();
-        fragmentTransaction.replace(contentView.getId(),
+        FragmentTransaction fragmentTransaction=getChildFragmentManager().beginTransaction();
+        fragmentTransaction.add(contentView.getId(),
                 fragment, getString(R.string.user_fragment_tag));
         fragmentTransaction.addToBackStack(getString(R.string.user_fragment_tag));
         fragmentTransaction.commit();
