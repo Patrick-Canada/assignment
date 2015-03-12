@@ -4,6 +4,7 @@ import android.os.Bundle;
 import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentTransaction;
 import android.view.LayoutInflater;
+import android.view.MotionEvent;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.AdapterView;
@@ -50,6 +51,14 @@ public class SendFragment extends Fragment {
                                           Bundle savedInstanceState) {
         View view= inflater.inflate(R.layout.fragment_net_work,container,false);
         contentView=view.findViewById(R.id.send_fragment);
+        View backgroundView=view.findViewById(R.id.send_background_view);
+        backgroundView.setOnTouchListener(new View.OnTouchListener() {
+            @Override
+            public boolean onTouch(View v, MotionEvent event) {
+                getActivity().getSupportFragmentManager().popBackStack();
+                return false;
+            }
+        });
         ListView listView=(ListView) view.findViewById(R.id.server_list_view);
         listView.setOnItemClickListener(new AdapterView.OnItemClickListener() {
             @Override

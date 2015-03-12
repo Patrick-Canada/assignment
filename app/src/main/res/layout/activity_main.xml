@@ -5,8 +5,9 @@
     tools:context=".MainActivity"
     android:id="@+id/main_view">
 
-    <TextView android:text="@string/hello_world"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content" />
+    <fragment
+        class="com.bowen.assignment.fragment.MapFragment"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"/>
 
 </FrameLayout>

@@ -6,6 +6,7 @@ import android.support.v7.app.ActionBarActivity;
 import android.os.Bundle;
 import android.view.Menu;
 import android.view.MenuItem;
+import android.view.MotionEvent;
 import android.view.View;
 
 import com.bowen.assignment.fragment.SendFragment;
@@ -15,9 +16,16 @@ public class MainActivity extends ActionBarActivity {
 
     private View mainView;
 
+    private boolean isShowingSend;
+
+    private static final String IsShowingSendKey="IsShowingSendKey";
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+        if (savedInstanceState!=null){
+            isShowingSend=savedInstanceState.getBoolean(IsShowingSendKey);
+        }
         setContentView(R.layout.activity_main);
         mainView=findViewById(R.id.main_view);
     }
@@ -40,6 +48,7 @@ public class MainActivity extends ActionBarActivity {
 
 
     public void showSendFragment(){
+        isShowingSend=true;
         SendFragment fragment=new SendFragment();
         FragmentTransaction fragmentTransaction=getSupportFragmentManager().beginTransaction();
         fragmentTransaction.add(mainView.getId(),
@@ -73,5 +82,11 @@ public class MainActivity extends ActionBarActivity {
         }
 
         return super.onOptionsItemSelected(item);
+    }
+
+    @Override
+    public void onSaveInstanceState(Bundle saveInstanceState){
+        saveInstanceState.putBoolean(IsShowingSendKey,isShowingSend);
+        super.onSaveInstanceState(saveInstanceState);
     }
 }

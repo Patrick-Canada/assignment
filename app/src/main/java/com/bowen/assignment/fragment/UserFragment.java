@@ -2,12 +2,10 @@ package com.bowen.assignment.fragment;
 import android.content.Intent;
 import android.os.Bundle;
 import android.support.v4.app.Fragment;
-import android.support.v7.app.ActionBarActivity;
 import android.view.LayoutInflater;
-import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
-import android.widget.Button;
+import android.widget.ImageButton;
 
 import com.bowen.assignment.GalleryActivity;
 import com.bowen.assignment.R;
@@ -17,13 +15,20 @@ import com.bowen.assignment.R;
  */
 public class UserFragment extends Fragment {
 
-    private Button choiceUserButton;
+    private ImageButton choiceUserButton;
 
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
         View view= inflater.inflate(R.layout.user_fragment,container,false);
-        this.setHasOptionsMenu(true);
-        choiceUserButton=(Button)view.findViewById(R.id.choice_user_button);
+        ImageButton imageButton=(ImageButton)view.findViewById(R.id.action_back_button);
+        imageButton.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                getFragmentManager().popBackStack();
+            }
+        });
+
+        choiceUserButton=(ImageButton)view.findViewById(R.id.user_image_button);
         choiceUserButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
@@ -32,26 +37,5 @@ public class UserFragment extends Fragment {
             }
         });
         return view;
-    }
-
-
-    @Override
-    public void onCreateOptionsMenu(android.view.Menu menu, android.view.MenuInflater inflater){
-        super.onCreateOptionsMenu(menu, inflater);
-        ((ActionBarActivity)getActivity()).getSupportActionBar().setDisplayHomeAsUpEnabled(true);
-        ((ActionBarActivity)getActivity()).getSupportActionBar().setTitle("Choice Icon");
-    }
-
-    @Override
-    public boolean onOptionsItemSelected(MenuItem item) {
-        // Handle item selection
-        switch (item.getItemId()) {
-            case android.R.id.home:
-                getFragmentManager().popBackStack();
-                ((ActionBarActivity)getActivity()).getSupportActionBar().setDisplayHomeAsUpEnabled(false);
-                return true;
-            default:
-                return super.onOptionsItemSelected(item);
-        }
     }
 }

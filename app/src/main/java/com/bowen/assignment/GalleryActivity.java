@@ -79,8 +79,7 @@ public class GalleryActivity extends ActionBarActivity implements GalleryAdapter
         switch (item.getItemId()) {
             // Respond to the action bar's Up/Home button
             case android.R.id.home:
-                Intent intent=new Intent(this,MainActivity.class);
-                startActivity(intent);
+                this.onBackPressed();
                 return true;
         }
         return super.onOptionsItemSelected(item);
