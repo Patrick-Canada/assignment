@@ -4,7 +4,7 @@ android {
     signingConfigs {
         google {
             keyAlias 'google'
-            storeFile file('/Users/patrick/work/2015/android/Assignment/app/google.jks')
+            storeFile file('/Users/gen/work/project/client/2015/android/assignment/app/google.jks')
         }
     }
     compileSdkVersion 21
@@ -21,6 +21,9 @@ android {
         release {
             minifyEnabled false
             proguardFiles getDefaultProguardFile('proguard-android.txt'), 'proguard-rules.pro'
+        }
+        debug {
+            signingConfig signingConfigs.google
         }
     }
     productFlavors {

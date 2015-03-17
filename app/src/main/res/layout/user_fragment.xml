@@ -1,56 +1,39 @@
 <?xml version="1.0" encoding="utf-8"?>
-<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
-    android:orientation="vertical"
+<FrameLayout xmlns:android="http://schemas.android.com/apk/res/android"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:background="@android:color/white"
-    android:layout_gravity="center_horizontal">
-    <FrameLayout
+    android:layout_gravity="center_horizontal"
+    android:orientation="vertical">
+    <LinearLayout
         android:layout_width="match_parent"
-        android:layout_height="48dp">
-        <View
-            android:layout_width="match_parent"
-            android:layout_height="match_parent"
-            android:background="@android:color/black">
-        </View>
-        <LinearLayout android:layout_width="match_parent"
-            android:layout_height="match_parent">
-            <ImageButton
-                android:layout_width="48dp"
-                android:layout_height="48dp"
-                android:src="@drawable/abc_ic_ab_back_mtrl_am_alpha"
-                android:background="@android:color/transparent"
-                android:id="@+id/action_back_button"/>
-            <TextView
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:padding="10dp"
-                android:text="Choice user icon"
-                android:textColor="@android:color/white"/>
-        </LinearLayout>
-    </FrameLayout>
-    <ImageButton
-        android:layout_width="100dp"
-        android:layout_height="100dp"
-        android:background="@android:color/holo_blue_light"
-        android:padding="10dp"
-        android:id="@+id/user_image_button"
-        android:layout_gravity="center_horizontal"
-        android:layout_marginTop="20dp" />
-    <TextView
-        android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:text="please press user icon to choice a icon"
-        android:textSize="10dp"
-        android:textColor="@android:color/holo_red_light"
-        android:layout_gravity="center_horizontal"
-        android:layout_marginTop="10dp" />
-    <Button
-        android:layout_width="@dimen/user_fragment_button_width"
-        android:layout_height="wrap_content"
-        android:text="send"
-        android:textSize="16dp"
-        android:padding="10dp"
-        android:layout_gravity="center_horizontal"
-        android:layout_marginTop="10dp" />
-</LinearLayout>
+        android:layout_gravity="center"
+        android:orientation="vertical">
+        <ImageButton
+            android:layout_width="100dp"
+            android:layout_height="100dp"
+            android:id="@+id/user_image_button"
+            android:scaleType="fitCenter"
+            android:layout_gravity="center_horizontal" />
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="please press user icon to choice a icon"
+            android:textSize="10dp"
+            android:textColor="@android:color/holo_red_light"
+            android:layout_gravity="center_horizontal"
+            android:layout_marginTop="10dp"
+            android:layout_centerHorizontal="true"
+            android:id="@+id/textView" />
+        <Button
+            android:layout_width="150dp"
+            android:layout_height="wrap_content"
+            android:text="Go"
+            android:id="@+id/go_button"
+            android:textSize="15dp"
+            android:layout_marginTop="10dp"
+            android:layout_gravity="center_horizontal"
+            android:enabled="false"/>
+    </LinearLayout>
+</FrameLayout>

@@ -4,10 +4,8 @@
     android:layout_height="match_parent"
     tools:context=".MainActivity"
     android:id="@+id/main_view">
-
     <fragment
-        class="com.bowen.assignment.fragment.MapFragment"
         android:layout_width="match_parent"
-        android:layout_height="match_parent"/>
-
+        android:layout_height="match_parent"
+        android:name="com.bowen.assignment.fragment.MapFragment"/>
 </FrameLayout>

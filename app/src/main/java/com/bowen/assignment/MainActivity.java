@@ -1,15 +1,21 @@
 package com.bowen.assignment;
 
+import android.app.ActionBar;
 import android.content.Intent;
+import android.graphics.Bitmap;
+import android.graphics.drawable.BitmapDrawable;
 import android.support.v4.app.FragmentTransaction;
 import android.support.v7.app.ActionBarActivity;
 import android.os.Bundle;
 import android.view.Menu;
 import android.view.MenuItem;
-import android.view.MotionEvent;
 import android.view.View;
 
+import com.bowen.assignment.common.FileUtil;
+import com.bowen.assignment.common.MConstant;
+import com.bowen.assignment.common.MGlobal;
 import com.bowen.assignment.fragment.SendFragment;
+import com.bowen.assignment.fragment.UserFragment;
 
 
 public class MainActivity extends ActionBarActivity {
@@ -23,11 +29,27 @@ public class MainActivity extends ActionBarActivity {
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+        getSupportActionBar().setDisplayOptions(ActionBar.DISPLAY_SHOW_HOME |
+                ActionBar.DISPLAY_SHOW_TITLE);
         if (savedInstanceState!=null){
             isShowingSend=savedInstanceState.getBoolean(IsShowingSendKey);
         }
         setContentView(R.layout.activity_main);
         mainView=findViewById(R.id.main_view);
+        configEnvironment();
+        if (MGlobal.getInstance().isShowUserIconConfig()){
+            showUserFragment();
+        }else{
+            Bitmap userBitMap=FileUtil.
+                    readFileFromInternalStorage(MConstant.USER_ICON_FILE_NAME);
+            getSupportActionBar().setIcon(new BitmapDrawable(this.getResources(),userBitMap));
+            getSupportActionBar().setDisplayShowTitleEnabled(false);
+        }
+    }
+
+
+    private void configEnvironment(){
+        MGlobal.init(this);
     }
 
 
@@ -39,12 +61,25 @@ public class MainActivity extends ActionBarActivity {
     }
 
 
+    public void showUserFragment(){
+        if (getSupportFragmentManager().
+                findFragmentByTag(getString(R.string.user_fragment_tag))==null){
+            UserFragment fragment=new UserFragment();
+            FragmentTransaction fragmentTransaction=getSupportFragmentManager().beginTransaction();
+            fragmentTransaction.add(mainView.getId(),
+                    fragment, getString(R.string.user_fragment_tag));
+            fragmentTransaction.addToBackStack(getString(R.string.user_fragment_tag));
+            fragmentTransaction.commit();
+        }
+    }
+
+
+
 
     public void goImagesActivity(){
         Intent intent=new Intent(this,GalleryActivity.class);
         startActivity(intent);
     }
-
 
 
     public void showSendFragment(){
@@ -70,13 +105,13 @@ public class MainActivity extends ActionBarActivity {
         int id = item.getItemId();
 
         //noinspection SimplifiableIfStatement
-        if (id == R.id.action_images) {
+        if (id == R.id.action_Location) {
             goImagesActivity();
             return true;
         }else if (id==R.id.action_camera){
             goCameraActivity();
             return true;
-        }else if (id==R.id.action_send){
+        }else if (id==R.id.action_setting){
             showSendFragment();
             return true;
         }
