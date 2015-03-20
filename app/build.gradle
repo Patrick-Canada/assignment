@@ -4,7 +4,7 @@ android {
     signingConfigs {
         google {
             keyAlias 'google'
-            storeFile file('/Users/gen/work/project/client/2015/android/assignment/app/google.jks')
+            storeFile file('/Users/gen/Downloads/google.jks')
         }
     }
     compileSdkVersion 21

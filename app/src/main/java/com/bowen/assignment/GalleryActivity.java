@@ -5,6 +5,7 @@ import android.view.MenuItem;
 import android.view.View;
 import android.widget.ListView;
 
+import com.bowen.assignment.common.FileUtil;
 import com.bowen.assignment.entity.ImageEntity;
 import com.bowen.assignment.vo.GalleryVO;
 

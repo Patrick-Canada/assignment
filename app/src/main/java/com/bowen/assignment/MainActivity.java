@@ -4,6 +4,7 @@ import android.app.ActionBar;
 import android.content.Intent;
 import android.graphics.Bitmap;
 import android.graphics.drawable.BitmapDrawable;
+import android.provider.MediaStore;
 import android.support.v4.app.FragmentTransaction;
 import android.support.v7.app.ActionBarActivity;
 import android.os.Bundle;
@@ -17,8 +18,12 @@ import com.bowen.assignment.common.MGlobal;
 import com.bowen.assignment.fragment.SendFragment;
 import com.bowen.assignment.fragment.UserFragment;
 
+import java.util.Date;
+
 
 public class MainActivity extends ActionBarActivity {
+
+    static final int REQUEST_IMAGE_CAPTURE = 1;
 
     private View mainView;
 
@@ -49,6 +54,7 @@ public class MainActivity extends ActionBarActivity {
 
 
     private void configEnvironment(){
+
         MGlobal.init(this);
     }
 
@@ -74,6 +80,13 @@ public class MainActivity extends ActionBarActivity {
     }
 
 
+    protected void onActivityResult(int requestCode, int resultCode, Intent data) {
+        if (requestCode == REQUEST_IMAGE_CAPTURE && resultCode == RESULT_OK) {
+            Bundle extras = data.getExtras();
+            Bitmap imageBitmap = (Bitmap) extras.get("data");
+            FileUtil.saveFile(imageBitmap, new Date().getTime()+"");
+        }
+    }
 
 
     public void goImagesActivity(){
@@ -94,7 +107,10 @@ public class MainActivity extends ActionBarActivity {
 
 
     public void goCameraActivity(){
-
+        Intent takePictureIntent = new Intent(MediaStore.ACTION_IMAGE_CAPTURE);
+        if (takePictureIntent.resolveActivity(getPackageManager()) != null) {
+            startActivityForResult(takePictureIntent, REQUEST_IMAGE_CAPTURE);
+        }
     }
 
     @Override
