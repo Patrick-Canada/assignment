@@ -1,0 +1,13 @@
+package com.bowen.assignment.common;
+
+/**
+ * Created by gen on 2015-03-14.
+ */
+public class MConstant {
+
+    public final static String SHOW_USER_CONFIG_KEY="SHOW_USER_CONFIG_KEY";
+
+    public final static String USER_ICON_FILE_NAME_KEY="USER_ICON_FILE_NAME_KEY";
+
+    public final static String USER_ICON_FILE_NAME="default_user_icon_name.png";
+}
