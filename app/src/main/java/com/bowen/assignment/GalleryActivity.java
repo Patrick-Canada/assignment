@@ -60,17 +60,17 @@ public class GalleryActivity extends ActionBarActivity implements GalleryAdapter
         super.onCreate(savedInstanceState);
         this.getSupportActionBar().setDisplayHomeAsUpEnabled(true);
         setContentView(R.layout.activity_image_list);
-        prepareDataSource(getImageEntities());
-        ListView listView=(ListView)findViewById(R.id.image_list_view);
-        GalleryAdapter galleryAdapter=new GalleryAdapter(this,this.dataSource);
-        galleryAdapter.setImageSelectedListener(this);
-        listView.setAdapter(galleryAdapter);
         imageDao = new MImageDao(this);
         try{
             imageDao.open();
         }catch (Exception SQLException){
             Log.e(TAG,"SQLException");
         }
+        prepareDataSource(getImageEntities());
+        ListView listView=(ListView)findViewById(R.id.image_list_view);
+        GalleryAdapter galleryAdapter=new GalleryAdapter(this,this.dataSource);
+        galleryAdapter.setImageSelectedListener(this);
+        listView.setAdapter(galleryAdapter);
     }
 
     @Override

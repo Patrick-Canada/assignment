@@ -217,9 +217,10 @@ public class MainActivity extends ActionBarActivity {
             imageEntity.setName("");
             imageDao.createImageEntity(imageEntity);
             FileUtil.saveFile(imageBitmap, fileName);
-        }else{
-            super.onActivityResult(requestCode,resultCode,data);
+            refreshIcon();
         }
+        super.onActivityResult(requestCode,resultCode,data);
+
     }
 
 

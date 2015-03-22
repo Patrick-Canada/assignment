@@ -10,6 +10,7 @@ import com.bowen.assignment.entity.ImageEntity;
 import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.List;
+
 /**
  * Created by gen on 2015-03-21.
  */
@@ -41,7 +42,7 @@ public class MImageDao {
         values.put(MImageDBHelper.COLUMN_IMAGE_PATH,imageEntity.getUri());
         values.put(MImageDBHelper.COLUMN_SEND_STAT,imageEntity.getSendState());
         values.put(MImageDBHelper.COLUMN_IMAGE_NAME,imageEntity.getName());
-        long insertId = database.insert(MImageDBHelper.TABLE_IMAGE, null,
+        long insertId = database.insertOrThrow(MImageDBHelper.TABLE_IMAGE, null,
                 values);
         Cursor cursor = database.query(MImageDBHelper.TABLE_IMAGE,
                 allColumns, MImageDBHelper.COLUMN_ID + " = " + insertId, null,
