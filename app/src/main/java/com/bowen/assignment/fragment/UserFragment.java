@@ -16,13 +16,13 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.Button;
 import android.widget.ImageButton;
+
+import com.bowen.assignment.MainActivity;
 import com.bowen.assignment.R;
 import com.bowen.assignment.common.FileUtil;
 import com.bowen.assignment.common.ImageUtil;
 import com.bowen.assignment.common.MConstant;
 import com.bowen.assignment.common.MGlobal;
-
-import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.io.InputStream;
 
@@ -39,9 +39,46 @@ public class UserFragment extends Fragment {
 
     private static final int SELECT_PICTURE = 1;
 
+    private Button cancelButton;
+
+    private boolean showCancelButton;
+
+    private Bitmap previousBitmap;
+
+    private Bitmap previousSmallBitmap;
+
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
         View view= inflater.inflate(R.layout.user_fragment,container,false);
+
+        cancelButton=(Button)view.findViewById(R.id.cancel_button);
+        Bundle arguments= getArguments();
+        if (arguments!=null&&arguments.containsKey("showCancelButton")){
+
+            showCancelButton=arguments.getBoolean("showCancelButton");
+            previousBitmap=FileUtil.readFileFromInternalStorage(MConstant.USER_ICON_FILE_NAME);
+            previousSmallBitmap=FileUtil.readFileFromInternalStorage(MConstant.USER_ICON_SMALL_FILE_NAME);
+            cancelButton.setVisibility(View.VISIBLE);
+            cancelButton.setOnClickListener(new View.OnClickListener() {
+                @Override
+                public void onClick(View v) {
+                    if (previousBitmap!=null){
+                        FileUtil.saveImageToInternalStorage(previousBitmap,
+                                MConstant.USER_ICON_FILE_NAME);
+                    }
+                    if (previousSmallBitmap!=null){
+
+                        FileUtil.saveImageToInternalStorage(previousSmallBitmap,
+                                MConstant.USER_ICON_SMALL_FILE_NAME);
+                    }
+                    ((MainActivity)getActivity()).refreshIcon();
+
+                    getFragmentManager().popBackStack();
+
+                }
+            });
+        }
+
         goButton=(Button)view.findViewById(R.id.go_button);
         goButton.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -61,46 +98,68 @@ public class UserFragment extends Fragment {
                         "Select Picture"), SELECT_PICTURE);
             }
         });
+
+
+        Bitmap icon=FileUtil.readFileFromInternalStorage(MConstant.USER_ICON_FILE_NAME);
+        if (icon!=null){
+            choiceUserButton.setImageBitmap(icon);
+        }
+
+        if (!showCancelButton){
+            cancelButton.setVisibility(View.GONE);
+        }
+
         return view;
     }
 
 
-    public String getUserIconName(){
-        return MConstant.USER_ICON_FILE_NAME;
-    }
-
-
-
     public void setActionLogo() {
-        Bitmap bitmap = FileUtil.readFileFromInternalStorage(getUserIconName());
-        ((ActionBarActivity) getActivity()).
-                getSupportActionBar().setIcon(new BitmapDrawable(this.getResources(), bitmap));
-        ((ActionBarActivity) getActivity()).
-                getSupportActionBar().setDisplayShowTitleEnabled(false);
+        Bitmap bitmap = FileUtil.readFileFromInternalStorage(MConstant.USER_ICON_SMALL_FILE_NAME);
+        if (bitmap!=null){
+            ((ActionBarActivity) getActivity()).
+                    getSupportActionBar().setIcon(new BitmapDrawable(this.getResources(), bitmap));
+            ((ActionBarActivity) getActivity()).
+                    getSupportActionBar().setDisplayShowTitleEnabled(false);
+            ((MainActivity)getActivity()).refreshIcon();
+        }
     }
 
+
+    public Bitmap getUserIconBitmap(Uri iconUri,int width,int height){
+        InputStream inputStream=null;
+        try {
+            inputStream=this.getActivity().getContentResolver().
+                    openInputStream(iconUri);
+            BitmapFactory.Options options=ImageUtil.
+                    optionsBitmapFromInputStream(inputStream,width,height);
+            Bitmap bitmap= ImageUtil.
+                    getBitmapFromUriByOptions(this.getActivity(), iconUri, options);
+            return bitmap;
+        }catch (IOException e){
+            Log.e(TAG, "exception", e);
+            showMessage("can't get image");
+        }finally {
+            try {
+                inputStream.close();
+            }catch (IOException e){
+                Log.e(TAG, "exception", e);
+                showMessage("can't get image");
+            }
+        }
+        return null;
+    }
 
     public void onActivityResult(int requestCode, int resultCode, Intent data) {
         if (resultCode == Activity.RESULT_OK) {
             Uri selectedImageUri = data.getData();
-            try {
-                InputStream inputStream=this.getActivity().getContentResolver().
-                        openInputStream(selectedImageUri);
-                BitmapFactory.Options options=ImageUtil.optionsBitmapFromInputStream(inputStream,95,95);
-                Bitmap bitmap= ImageUtil.getBitmapFromUriByOptions(this.getActivity(), selectedImageUri, options);
-                inputStream.close();
-                choiceUserButton.setImageBitmap(bitmap);
-                goButton.setEnabled(true);
-                MGlobal.getInstance().setShowUserIconConfig(false);
-                FileUtil.saveImageToInternalStorage(bitmap, getUserIconName());
-                setActionLogo();
-            } catch (FileNotFoundException e) {
-                Log.e(TAG, "exception", e);
-                showMessage("can't get image");
-            } catch (IOException e){
-                Log.e(TAG,"exception",e);
-                showMessage("can't get image");
-            }
+            Bitmap userIcon=getUserIconBitmap(selectedImageUri,95,95);
+            choiceUserButton.setImageBitmap(userIcon);
+            goButton.setEnabled(true);
+            MGlobal.getInstance().setShowUserIconConfig(false);
+            FileUtil.saveImageToInternalStorage(userIcon,MConstant.USER_ICON_FILE_NAME);
+            Bitmap smallIcon=getUserIconBitmap(selectedImageUri,30,30);
+            FileUtil.saveImageToInternalStorage(smallIcon,MConstant.USER_ICON_SMALL_FILE_NAME);
+            setActionLogo();
         }
     }
 

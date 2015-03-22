@@ -93,9 +93,13 @@ public class FileUtil {
         try {
             Context context=MGlobal.getInstance().context;
             File filePath = context.getFileStreamPath(fileName);
-            FileInputStream fi = new FileInputStream(filePath);
-            Bitmap thumbnail = BitmapFactory.decodeStream(fi);
-            return thumbnail;
+            if (filePath.exists()){
+                FileInputStream fi = new FileInputStream(filePath);
+                Bitmap thumbnail = BitmapFactory.decodeStream(fi);
+                return thumbnail;
+            }else {
+                return null;
+            }
         } catch (Exception ex) {
             Log.e(TAG, ex.getMessage());
             return null;

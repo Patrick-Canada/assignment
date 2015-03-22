@@ -10,4 +10,6 @@ public class MConstant {
     public final static String USER_ICON_FILE_NAME_KEY="USER_ICON_FILE_NAME_KEY";
 
     public final static String USER_ICON_FILE_NAME="default_user_icon_name.png";
+
+    public final static String USER_ICON_SMALL_FILE_NAME="default_user_icon_small_name.png";
 }

@@ -1,11 +1,12 @@
 package com.bowen.assignment;
 import android.os.Bundle;
 import android.support.v7.app.ActionBarActivity;
+import android.util.Log;
 import android.view.MenuItem;
 import android.view.View;
 import android.widget.ListView;
 
-import com.bowen.assignment.common.FileUtil;
+import com.bowen.assignment.dao.MImageDao;
 import com.bowen.assignment.entity.ImageEntity;
 import com.bowen.assignment.vo.GalleryVO;
 
@@ -18,18 +19,15 @@ import java.util.List;
 public class GalleryActivity extends ActionBarActivity implements GalleryAdapter.GalleryImageSelectedListener{
 
 
+    private final static String TAG="GalleryActivity";
+
     private List<GalleryVO> dataSource=new ArrayList<>();
+
+    private MImageDao imageDao;
 
 
     private List<ImageEntity> getImageEntities(){
-
-        List<ImageEntity> entities=new ArrayList<>();
-        for (int i=0;i<10;i++){
-            ImageEntity entity=new ImageEntity();
-            entity.setName("image:"+i);
-            entities.add(entity);
-        }
-
+        List<ImageEntity> entities=imageDao.getAllImages();
         return entities;
     }
 
@@ -67,6 +65,12 @@ public class GalleryActivity extends ActionBarActivity implements GalleryAdapter
         GalleryAdapter galleryAdapter=new GalleryAdapter(this,this.dataSource);
         galleryAdapter.setImageSelectedListener(this);
         listView.setAdapter(galleryAdapter);
+        imageDao = new MImageDao(this);
+        try{
+            imageDao.open();
+        }catch (Exception SQLException){
+            Log.e(TAG,"SQLException");
+        }
     }
 
     @Override
@@ -84,4 +88,22 @@ public class GalleryActivity extends ActionBarActivity implements GalleryAdapter
         }
         return super.onOptionsItemSelected(item);
     }
+
+    @Override
+    protected void onResume() {
+        try{
+            imageDao.open();
+        }catch (Exception SQLException){
+            Log.e(TAG,"SQLException");
+        }
+        super.onResume();
+    }
+
+    @Override
+    protected void onPause() {
+        imageDao.close();
+        super.onPause();
+    }
+
+
 }

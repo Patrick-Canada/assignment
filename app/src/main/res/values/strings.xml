@@ -9,5 +9,6 @@
     <string name="app_images">images</string>
     <string name="send_fragment_tag">send_fragment_tag</string>
     <string name="user_fragment_tag">user_fragment_tag</string>
+    <string name="map_fragment_tag">map_fragment_tag</string>
     <string name="user_config_info">user_config_info</string>
 </resources>

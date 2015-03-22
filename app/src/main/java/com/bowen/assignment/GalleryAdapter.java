@@ -1,5 +1,6 @@
 package com.bowen.assignment;
 import android.content.Context;
+import android.text.TextUtils;
 import android.view.LayoutInflater;
 import android.view.MotionEvent;
 import android.view.View;
@@ -8,6 +9,8 @@ import android.widget.ArrayAdapter;
 import android.widget.ImageView;
 import android.widget.TextView;
 
+import com.bowen.assignment.common.FileUtil;
+import com.bowen.assignment.common.ImageUtil;
 import com.bowen.assignment.entity.ImageEntity;
 import com.bowen.assignment.vo.GalleryVO;
 
@@ -109,17 +112,26 @@ public class GalleryAdapter extends ArrayAdapter<GalleryVO> {
                 viewHolder.textView1.setText(entity.getX()+" "+entity.getY());
                 viewHolder.imageView1.setVisibility(View.VISIBLE);
                 viewHolder.textView1.setVisibility(View.VISIBLE);
+                if (!TextUtils.isEmpty(entity.getUri())){
+                   viewHolder.imageView1.setImageBitmap(FileUtil.getFileByName(entity.getUri()));
+                }
             }
             if (i==1){
                 viewHolder.textView2.setText(entity.getX()+" "+entity.getY());
                 viewHolder.imageView2.setVisibility(View.VISIBLE);
                 viewHolder.textView2.setVisibility(View.VISIBLE);
+                if (!TextUtils.isEmpty(entity.getUri())){
+                    viewHolder.imageView2.setImageBitmap(FileUtil.getFileByName(entity.getUri()));
+                }
             }
 
             if (i==2){
                 viewHolder.textView3.setText(entity.getX()+" "+entity.getY());
                 viewHolder.imageView3.setVisibility(View.VISIBLE);
                 viewHolder.textView3.setVisibility(View.VISIBLE);
+                if (!TextUtils.isEmpty(entity.getUri())){
+                    viewHolder.imageView3.setImageBitmap(FileUtil.getFileByName(entity.getUri()));
+                }
             }
             i++;
 

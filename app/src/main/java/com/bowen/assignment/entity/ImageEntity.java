@@ -5,7 +5,7 @@ package com.bowen.assignment.entity;
  */
 public class ImageEntity {
 
-    private int id;
+    private long id;
 
     private String name;
 
@@ -15,18 +15,18 @@ public class ImageEntity {
 
     private String uri;
 
-    private long createTime;
-
-    public int getId() {
-        return id;
-    }
-
-    public void setId(int id) {
-        this.id = id;
-    }
+    private int sendState;
 
     public String getName() {
         return name;
+    }
+
+    public long getId() {
+        return id;
+    }
+
+    public void setId(long id) {
+        this.id = id;
     }
 
     public void setName(String name) {
@@ -57,11 +57,11 @@ public class ImageEntity {
         this.uri = uri;
     }
 
-    public long getCreateTime() {
-        return createTime;
+    public int getSendState() {
+        return sendState;
     }
 
-    public void setCreateTime(long createTime) {
-        this.createTime = createTime;
+    public void setSendState(int sendState) {
+        this.sendState = sendState;
     }
 }
