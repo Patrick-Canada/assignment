@@ -1,5 +1,7 @@
 package com.bowen.assignment.fragment;
 
+import android.app.AlertDialog;
+import android.content.DialogInterface;
 import android.net.nsd.NsdManager;
 import android.net.nsd.NsdServiceInfo;
 import android.os.Bundle;
@@ -14,6 +16,10 @@ import android.widget.AdapterView;
 import android.widget.ListView;
 
 import com.bowen.assignment.R;
+import com.bowen.assignment.common.*;
+import com.bowen.assignment.model.BaseModel;
+import com.bowen.assignment.model.GPSModel;
+import com.bowen.assignment.model.ModelDelegate;
 import com.bowen.assignment.vo.LocalServerVO;
 
 import java.util.ArrayList;
@@ -22,7 +28,7 @@ import java.util.List;
 /**
  * Created by patrick on 2015-03-10.
  */
-public class SendFragment extends Fragment {
+public class SendFragment extends Fragment implements ModelDelegate{
 
     private final static String TAG="SendFragment";
 
@@ -34,7 +40,9 @@ public class SendFragment extends Fragment {
 
     NsdManager nsdManager;
 
-    private final static String SERVICE_TYPE="_http._tcp.";
+    private ListView listView;
+
+    private final static String SERVICE_TYPE="_ssh._tcp.";
 
     public void configBonjourBrowser(){
 
@@ -68,6 +76,9 @@ public class SendFragment extends Fragment {
                 serverVO.setIpAddress(serviceInfo.getHost()+" port:"+serviceInfo.getPort());
 
                 dataSource.add(serverVO);
+                refreshTable();
+
+
             }
 
             @Override
@@ -83,13 +94,43 @@ public class SendFragment extends Fragment {
     }
 
 
-    public void showUserFragment(){
-        UserFragment fragment=new UserFragment();
-        FragmentTransaction fragmentTransaction=getChildFragmentManager().beginTransaction();
-        fragmentTransaction.add(contentView.getId(),
-                fragment, getString(R.string.user_fragment_tag));
-        fragmentTransaction.addToBackStack(getString(R.string.user_fragment_tag));
-        fragmentTransaction.commit();
+    private void refreshTable(){
+        ((SendAdapter)listView.getAdapter()).notifyDataSetChanged();
+    }
+
+
+    public void alert(String message){
+        new AlertDialog.Builder(this.getActivity())
+                .setTitle("Message")
+                .setMessage(message)
+                .setPositiveButton(android.R.string.yes, new DialogInterface.OnClickListener() {
+                    public void onClick(DialogInterface dialog, int which) {
+                        dialog.dismiss();
+                    }
+                }).show();
+    }
+
+    public void send(){
+
+        MGlobal global=MGlobal.getInstance();
+        if (global.getUserId().length()==0){
+
+            alert("please choice a user icon");
+
+            return;
+        }
+
+        GPSModel gpsModel=GPSModel.initGPS(global.getUserId(),getGPSData());
+        gpsModel.setDelegate(this);
+        gpsModel.startLoad();
+
+    }
+
+
+    //to do
+    public String getGPSData(){
+
+        return "";
     }
 
 
@@ -105,11 +146,11 @@ public class SendFragment extends Fragment {
                 return false;
             }
         });
-        ListView listView=(ListView) view.findViewById(R.id.server_list_view);
+        listView=(ListView) view.findViewById(R.id.server_list_view);
         listView.setOnItemClickListener(new AdapterView.OnItemClickListener() {
             @Override
             public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
-                showUserFragment();
+              send();
             }
         });
 
@@ -119,4 +160,15 @@ public class SendFragment extends Fragment {
         return view;
     }
 
+    @Override
+    public void didFinishLoad(BaseModel model) {
+        alert("send gps data success");
+    }
+
+    @Override
+    public void didLoadError(BaseModel model) {
+
+        com.bowen.assignment.common.Error error=model.getError();
+        alert(error.getMessage());
+    }
 }

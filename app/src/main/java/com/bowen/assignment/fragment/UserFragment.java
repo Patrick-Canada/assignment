@@ -15,20 +15,20 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.Button;
 import android.widget.ImageButton;
-
 import com.bowen.assignment.MainActivity;
 import com.bowen.assignment.R;
-import com.bowen.assignment.common.FileUtil;
-import com.bowen.assignment.common.ImageUtil;
-import com.bowen.assignment.common.MConstant;
-import com.bowen.assignment.common.MGlobal;
+import com.bowen.assignment.common.*;
+import com.bowen.assignment.model.BaseModel;
+import com.bowen.assignment.model.ModelDelegate;
+import com.bowen.assignment.model.UserModel;
+
 import java.io.IOException;
 import java.io.InputStream;
 
 /**
  * Created by patrick on 2015-03-10.
  */
-public class UserFragment extends Fragment {
+public class UserFragment extends Fragment implements ModelDelegate{
 
     private ImageButton choiceUserButton;
 
@@ -158,6 +158,20 @@ public class UserFragment extends Fragment {
             Bitmap smallIcon=getUserIconBitmap(selectedImageUri,30,30);
             FileUtil.saveImageToInternalStorage(smallIcon,MConstant.USER_ICON_SMALL_FILE_NAME);
             setActionLogo();
+
+            if (MGlobal.getInstance().getUserId().length()==0){
+
+                UserModel userModel=UserModel.initUser(ImageUtil.bitmap2base64(smallIcon));
+                userModel.setDelegate(this);
+                userModel.startLoad();
+            }else{
+
+                UserModel userModel=UserModel.updateUser(MGlobal.getInstance().getUserId(),
+                        ImageUtil.bitmap2base64(smallIcon));
+                userModel.setDelegate(this);
+                userModel.startLoad();
+            }
+
         }
     }
 
@@ -175,4 +189,35 @@ public class UserFragment extends Fragment {
                 }).create().show();
     }
 
+    @Override
+    public void didFinishLoad(BaseModel model) {
+
+        if (model instanceof UserModel){
+
+            if (model.getAction().equals("initUser")){
+                String result=(String) model.getResults().get(0);
+                MGlobal.getInstance().saveUserId(result);
+            }
+        }
+    }
+
+
+    public void alert(String message){
+        new AlertDialog.Builder(this.getActivity())
+                .setTitle("Message")
+                .setMessage(message)
+                .setPositiveButton(android.R.string.yes, new DialogInterface.OnClickListener() {
+                    public void onClick(DialogInterface dialog, int which) {
+                        dialog.dismiss();
+                    }
+                }).show();
+    }
+
+    @Override
+    public void didLoadError(BaseModel model) {
+
+        com.bowen.assignment.common.Error error= model.getError();
+        String message=  error.getMessage();
+        alert(message);
+    }
 }

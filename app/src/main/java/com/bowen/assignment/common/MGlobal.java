@@ -47,6 +47,18 @@ public class MGlobal {
 
     }
 
+
+    public String getUserId(){
+
+       return getUserConfigPreferences().getString(MConstant.USER_ID_KEY,"");
+    }
+
+
+    public void saveUserId(String id){
+
+        getUserConfigPreferences().edit().putString(MConstant.USER_ID_KEY,id).commit();
+    }
+
     public void setShowUserIconConfig(boolean showUserIconConfig) {
 
         getUserConfigPreferences().edit().
