@@ -3,8 +3,10 @@ import android.content.Intent;
 import android.graphics.Bitmap;
 import android.location.Criteria;
 import android.location.Location;
+import android.location.LocationListener;
 import android.location.LocationManager;
 import android.provider.MediaStore;
+import android.provider.Settings;
 import android.support.v4.app.FragmentTransaction;
 import android.support.v7.app.ActionBarActivity;
 import android.os.Bundle;
@@ -35,7 +37,7 @@ import java.util.Date;
 import java.util.List;
 
 
-public class MainActivity extends ActionBarActivity {
+public class MainActivity extends ActionBarActivity implements LocationListener{
 
     private final static String TAG="MainActivity";
 
@@ -53,8 +55,9 @@ public class MainActivity extends ActionBarActivity {
 
     private LatLng myPosition;
 
-
     private List<Marker> markerList=new ArrayList<>();
+
+    private List<ImageEntity> entities=new ArrayList<>();
 
     private ImageButton userIcon;
 
@@ -101,29 +104,18 @@ public class MainActivity extends ActionBarActivity {
         }
     }
 
+
+
+    public void setUserIcon(Bitmap bitmap){
+        userIcon.setImageBitmap(bitmap);
+    }
+
     public void showMyself(){
         Location location=getCurrentLocation();
         if(location!=null){
-            // Getting latitude of the current location
             double latitude = location.getLatitude();
-
-            // Getting longitude of the current location
             double longitude = location.getLongitude();
-
             myPosition = new LatLng(latitude, longitude);
-
-            Bitmap icon=FileUtil.readFileFromInternalStorage(MConstant.USER_ICON_SMALL_FILE_NAME);
-
-            if (icon!=null){
-                 Marker marker= googleMap.addMarker(new MarkerOptions().position(myPosition).
-                        title("Start").
-                        icon(BitmapDescriptorFactory.fromBitmap(icon)));
-                 this.markerList.add(marker);
-            }else{
-                Marker marker= googleMap.addMarker(new MarkerOptions().position(myPosition).
-                        title("Start"));
-                this.markerList.add(marker);
-            }
             zoomToPoint(myPosition);
         }
     }
@@ -151,10 +143,20 @@ public class MainActivity extends ActionBarActivity {
         // Getting LocationManager object from System Service LOCATION_SERVICE
         locationManager = (LocationManager) this.
                 getSystemService(LOCATION_SERVICE);
+        locationManager.requestLocationUpdates(LocationManager.GPS_PROVIDER,1000,0,this);
 
-        googleMap.getUiSettings().setMyLocationButtonEnabled(false);
+
+        if (!locationManager.isProviderEnabled(LocationManager.GPS_PROVIDER)){
+
+            Intent intent=new Intent(Settings.ACTION_LOCALE_SETTINGS);
+            startActivity(intent);
+        }
+
         googleMap.setMyLocationEnabled(true);
+        googleMap.getUiSettings().setMyLocationButtonEnabled(true);
         showMyself();
+
+        refreshIcons();
     }
 
 
@@ -163,16 +165,6 @@ public class MainActivity extends ActionBarActivity {
         // Inflate the menu; this adds items to the action bar if it is present.
         getMenuInflater().inflate(R.menu.menu_main, menu);
         return true;
-    }
-
-
-    public void refreshIcon(){
-        Bitmap icon=FileUtil.readFileFromInternalStorage(MConstant.USER_ICON_SMALL_FILE_NAME);
-        userIcon.setImageBitmap(icon);
-
-        for (Marker marker:this.markerList){
-            marker.setIcon(BitmapDescriptorFactory.fromBitmap(icon));
-        }
     }
 
 
@@ -202,6 +194,39 @@ public class MainActivity extends ActionBarActivity {
         return location;
     }
 
+
+    private void removeAllMarkers(){
+        for (Marker marker:this.markerList){
+            marker.remove();
+        }
+        this.markerList.clear();
+    }
+
+    private void refreshMarkers(){
+        this.removeAllMarkers();
+        Bitmap icon=FileUtil.readFileFromInternalStorage(MConstant.USER_ICON_SMALL_FILE_NAME);
+        for (ImageEntity imageEntity:this.entities){
+            double lat= imageEntity.getX();
+            double log= imageEntity.getY();
+            LatLng myPosition = new LatLng(lat, log);
+            Marker marker= googleMap.addMarker(new MarkerOptions().position(myPosition).
+                    icon(BitmapDescriptorFactory.fromBitmap(icon)));
+            this.markerList.add(marker);
+        }
+    }
+
+
+    private void refreshImageEntities(){
+       this.entities=imageDao.getAllImages();
+    }
+
+
+    public void refreshIcons(){
+
+        refreshImageEntities();
+        refreshMarkers();
+    }
+
     protected void onActivityResult(int requestCode, int resultCode, Intent data) {
         if (requestCode == REQUEST_IMAGE_CAPTURE && resultCode == RESULT_OK) {
             Bundle extras = data.getExtras();
@@ -217,7 +242,7 @@ public class MainActivity extends ActionBarActivity {
             imageEntity.setName("");
             imageDao.createImageEntity(imageEntity);
             FileUtil.saveFile(imageBitmap, fileName);
-            refreshIcon();
+            refreshIcons();
         }
         super.onActivityResult(requestCode,resultCode,data);
 
@@ -269,6 +294,8 @@ public class MainActivity extends ActionBarActivity {
         return super.onOptionsItemSelected(item);
     }
 
+
+
     @Override
     public void onSaveInstanceState(Bundle saveInstanceState){
         saveInstanceState.putBoolean(IsShowingSendKey,isShowingSend);
@@ -289,6 +316,27 @@ public class MainActivity extends ActionBarActivity {
     @Override
     protected void onPause() {
         imageDao.close();
+        locationManager.removeUpdates(this);
         super.onPause();
+    }
+
+    @Override
+    public void onLocationChanged(Location location) {
+
+    }
+
+    @Override
+    public void onStatusChanged(String provider, int status, Bundle extras) {
+
+    }
+
+    @Override
+    public void onProviderEnabled(String provider) {
+
+    }
+
+    @Override
+    public void onProviderDisabled(String provider) {
+
     }
 }

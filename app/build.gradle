@@ -4,14 +4,14 @@ android {
     signingConfigs {
         google {
             keyAlias 'google'
-            storeFile file('/Users/gen/Downloads/google.jks')
+            storeFile file('/Users/patrick/Downloads/google.jks')
         }
     }
     compileSdkVersion 21
     buildToolsVersion "21.1.1"
     defaultConfig {
         applicationId "com.bowen.assignment"
-        minSdkVersion 14
+        minSdkVersion 16
         targetSdkVersion 21
         versionCode 1
         versionName "1.0"

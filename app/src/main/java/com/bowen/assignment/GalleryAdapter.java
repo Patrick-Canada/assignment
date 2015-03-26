@@ -10,7 +10,6 @@ import android.widget.ImageView;
 import android.widget.TextView;
 
 import com.bowen.assignment.common.FileUtil;
-import com.bowen.assignment.common.ImageUtil;
 import com.bowen.assignment.entity.ImageEntity;
 import com.bowen.assignment.vo.GalleryVO;
 

@@ -5,7 +5,6 @@ import android.content.DialogInterface;
 import android.content.Intent;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
-import android.graphics.drawable.BitmapDrawable;
 import android.net.Uri;
 import android.os.Bundle;
 import android.support.v4.app.Fragment;
@@ -71,7 +70,7 @@ public class UserFragment extends Fragment {
                         FileUtil.saveImageToInternalStorage(previousSmallBitmap,
                                 MConstant.USER_ICON_SMALL_FILE_NAME);
                     }
-                    ((MainActivity)getActivity()).refreshIcon();
+                    ((MainActivity)getActivity()).refreshIcons();
 
                     getFragmentManager().popBackStack();
 
@@ -116,11 +115,10 @@ public class UserFragment extends Fragment {
     public void setActionLogo() {
         Bitmap bitmap = FileUtil.readFileFromInternalStorage(MConstant.USER_ICON_SMALL_FILE_NAME);
         if (bitmap!=null){
-            ((ActionBarActivity) getActivity()).
-                    getSupportActionBar().setIcon(new BitmapDrawable(this.getResources(), bitmap));
+            ((MainActivity)getActivity()).setUserIcon(bitmap);
             ((ActionBarActivity) getActivity()).
                     getSupportActionBar().setDisplayShowTitleEnabled(false);
-            ((MainActivity)getActivity()).refreshIcon();
+            ((MainActivity)getActivity()).refreshIcons();
         }
     }
 

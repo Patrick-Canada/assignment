@@ -1,8 +1,11 @@
 package com.bowen.assignment.fragment;
 
+import android.net.nsd.NsdManager;
+import android.net.nsd.NsdServiceInfo;
 import android.os.Bundle;
 import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentTransaction;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.MotionEvent;
 import android.view.View;
@@ -21,19 +24,62 @@ import java.util.List;
  */
 public class SendFragment extends Fragment {
 
+    private final static String TAG="SendFragment";
+
     private View contentView;
 
     private List<LocalServerVO> dataSource=new ArrayList<>();
 
-    public void prepareDataSource(){
+    NsdManager.DiscoveryListener browser;
 
-        dataSource.clear();
-        for (int i=0;i<5;i++){
-            LocalServerVO serverVO=new LocalServerVO();
-            serverVO.setName("Server "+i);
-            serverVO.setIpAddress("192.168.1."+i);
-            dataSource.add(serverVO);
-        }
+    NsdManager nsdManager;
+
+    private final static String SERVICE_TYPE="_http._tcp.";
+
+    public void configBonjourBrowser(){
+
+        browser=new NsdManager.DiscoveryListener() {
+            @Override
+            public void onStartDiscoveryFailed(String serviceType, int errorCode) {
+                Log.e(TAG, "Discovery failed: Error code:" + errorCode);
+            }
+
+            @Override
+            public void onStopDiscoveryFailed(String serviceType, int errorCode) {
+                Log.e(TAG, "Discovery stop failed: Error code:" + errorCode);
+            }
+
+            @Override
+            public void onDiscoveryStarted(String serviceType) {
+                Log.d(TAG, "Service discovery started");
+            }
+
+            @Override
+            public void onDiscoveryStopped(String serviceType) {
+
+                Log.i(TAG, "Discovery stopped: " + serviceType);
+            }
+
+            @Override
+            public void onServiceFound(NsdServiceInfo serviceInfo) {
+
+                LocalServerVO serverVO=new LocalServerVO();
+                serverVO.setName(serviceInfo.getServiceName());
+                serverVO.setIpAddress(serviceInfo.getHost()+" port:"+serviceInfo.getPort());
+
+                dataSource.add(serverVO);
+            }
+
+            @Override
+            public void onServiceLost(NsdServiceInfo serviceInfo) {
+
+                Log.e(TAG, "service lost" + serviceInfo.getServiceName());
+            }
+        };
+
+        nsdManager = (NsdManager) getActivity().getSystemService(getActivity().NSD_SERVICE);
+        nsdManager.discoverServices(SERVICE_TYPE, NsdManager.PROTOCOL_DNS_SD, browser);
+
     }
 
 
@@ -66,7 +112,9 @@ public class SendFragment extends Fragment {
                 showUserFragment();
             }
         });
-        prepareDataSource();
+
+        this.configBonjourBrowser();
+
         listView.setAdapter(new SendAdapter(this.getActivity(),dataSource));
         return view;
     }
