@@ -107,6 +107,7 @@ public class MainActivity extends ActionBarActivity implements LocationListener{
 
 
     public void setUserIcon(Bitmap bitmap){
+
         userIcon.setImageBitmap(bitmap);
     }
 
@@ -180,6 +181,7 @@ public class MainActivity extends ActionBarActivity implements LocationListener{
                     fragment, getString(R.string.user_fragment_tag));
             fragmentTransaction.addToBackStack(getString(R.string.user_fragment_tag));
             fragmentTransaction.commit();
+
         }
     }
 
@@ -217,7 +219,8 @@ public class MainActivity extends ActionBarActivity implements LocationListener{
 
 
     private void refreshImageEntities(){
-       this.entities=imageDao.getAllImages();
+
+        this.entities=imageDao.getAllImages();
     }
 
 
@@ -259,7 +262,7 @@ public class MainActivity extends ActionBarActivity implements LocationListener{
         isShowingSend=true;
         SendFragment fragment=new SendFragment();
         FragmentTransaction fragmentTransaction=getSupportFragmentManager().beginTransaction();
-        fragmentTransaction.add(mainView.getId(),
+        fragmentTransaction.replace(mainView.getId(),
                 fragment, getString(R.string.send_fragment_tag));
         fragmentTransaction.addToBackStack(getString(R.string.send_fragment_tag));
         fragmentTransaction.commit();

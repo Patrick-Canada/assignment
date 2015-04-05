@@ -26,7 +26,7 @@ public class GalleryActivity extends ActionBarActivity implements GalleryAdapter
     private MImageDao imageDao;
 
 
-    private List<ImageEntity> getImageEntities(){
+    protected List<ImageEntity> getImageEntities(){
         List<ImageEntity> entities=imageDao.getAllImages();
         return entities;
     }

@@ -1,12 +1,9 @@
 package com.bowen.assignment.fragment;
-
-import android.app.AlertDialog;
-import android.content.DialogInterface;
+import android.app.Activity;
 import android.net.nsd.NsdManager;
 import android.net.nsd.NsdServiceInfo;
 import android.os.Bundle;
 import android.support.v4.app.Fragment;
-import android.support.v4.app.FragmentTransaction;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.MotionEvent;
@@ -17,6 +14,7 @@ import android.widget.ListView;
 
 import com.bowen.assignment.R;
 import com.bowen.assignment.common.*;
+import com.bowen.assignment.common.Error;
 import com.bowen.assignment.model.BaseModel;
 import com.bowen.assignment.model.GPSModel;
 import com.bowen.assignment.model.ModelDelegate;
@@ -32,19 +30,21 @@ public class SendFragment extends Fragment implements ModelDelegate{
 
     private final static String TAG="SendFragment";
 
-    private View contentView;
-
     private List<LocalServerVO> dataSource=new ArrayList<>();
 
     NsdManager.DiscoveryListener browser;
 
     NsdManager nsdManager;
 
+    boolean discoveryStart;
+
     private ListView listView;
 
     private final static String SERVICE_TYPE="_ssh._tcp.";
 
     public void configBonjourBrowser(){
+
+        final Activity activity=this.getActivity();
 
         browser=new NsdManager.DiscoveryListener() {
             @Override
@@ -60,6 +60,7 @@ public class SendFragment extends Fragment implements ModelDelegate{
             @Override
             public void onDiscoveryStarted(String serviceType) {
                 Log.d(TAG, "Service discovery started");
+                discoveryStart=true;
             }
 
             @Override
@@ -71,14 +72,20 @@ public class SendFragment extends Fragment implements ModelDelegate{
             @Override
             public void onServiceFound(NsdServiceInfo serviceInfo) {
 
-                LocalServerVO serverVO=new LocalServerVO();
-                serverVO.setName(serviceInfo.getServiceName());
-                serverVO.setIpAddress(serviceInfo.getHost()+" port:"+serviceInfo.getPort());
+                if (discoveryStart){
+                    LocalServerVO serverVO=new LocalServerVO();
+                    serverVO.setName(serviceInfo.getServiceName());
+                    serverVO.setIpAddress(serviceInfo.getHost()+" port:"+serviceInfo.getPort());
 
-                dataSource.add(serverVO);
-                refreshTable();
+                    dataSource.add(serverVO);
 
-
+                    activity.runOnUiThread(new Runnable() {
+                        @Override
+                        public void run() {
+                            refreshTable();
+                        }
+                    });
+                }
             }
 
             @Override
@@ -95,32 +102,22 @@ public class SendFragment extends Fragment implements ModelDelegate{
 
 
     private void refreshTable(){
+
         ((SendAdapter)listView.getAdapter()).notifyDataSetChanged();
     }
 
-
-    public void alert(String message){
-        new AlertDialog.Builder(this.getActivity())
-                .setTitle("Message")
-                .setMessage(message)
-                .setPositiveButton(android.R.string.yes, new DialogInterface.OnClickListener() {
-                    public void onClick(DialogInterface dialog, int which) {
-                        dialog.dismiss();
-                    }
-                }).show();
-    }
 
     public void send(){
 
         MGlobal global=MGlobal.getInstance();
         if (global.getUserId().length()==0){
 
-            alert("please choice a user icon");
+            MGlobal.getInstance().alert("please choice a user icon",this.getActivity());
 
             return;
         }
-
-        GPSModel gpsModel=GPSModel.initGPS(global.getUserId(),getGPSData());
+        GPSModel gpsModel=GPSModel.initGPS(global.getAddress(),global.getPort(),
+                global.getUserId(),getGPSData());
         gpsModel.setDelegate(this);
         gpsModel.startLoad();
 
@@ -137,12 +134,17 @@ public class SendFragment extends Fragment implements ModelDelegate{
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                                           Bundle savedInstanceState) {
         View view= inflater.inflate(R.layout.fragment_net_work,container,false);
-        contentView=view.findViewById(R.id.send_fragment);
         View backgroundView=view.findViewById(R.id.send_background_view);
         backgroundView.setOnTouchListener(new View.OnTouchListener() {
             @Override
             public boolean onTouch(View v, MotionEvent event) {
-                getActivity().getSupportFragmentManager().popBackStack();
+                if (discoveryStart){
+
+                    nsdManager.stopServiceDiscovery(browser);
+                    discoveryStart=false;
+                }
+                nsdManager=null;
+                getActivity().getSupportFragmentManager().popBackStackImmediate();
                 return false;
             }
         });
@@ -162,13 +164,22 @@ public class SendFragment extends Fragment implements ModelDelegate{
 
     @Override
     public void didFinishLoad(BaseModel model) {
-        alert("send gps data success");
+        MGlobal.getInstance().alert("send gps data success",this.getActivity());
     }
 
     @Override
     public void didLoadError(BaseModel model) {
 
-        com.bowen.assignment.common.Error error=model.getError();
-        alert(error.getMessage());
+        Error error=model.getError();
+        MGlobal.getInstance().alert(error.getMessage(),this.getActivity());
     }
+
+
+    public void onPause(){
+
+        super.onPause();
+    }
+
+
+
 }

@@ -1,6 +1,7 @@
 package com.bowen.assignment.common;
 
 import android.content.Context;
+import android.content.res.AssetManager;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 import android.util.Log;
@@ -10,6 +11,7 @@ import java.io.FileInputStream;
 import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
 import java.io.IOException;
+import java.io.InputStream;
 
 /**
  * Created by gen on 2015-03-14.
@@ -104,6 +106,19 @@ public class FileUtil {
             Log.e(TAG, ex.getMessage());
             return null;
         }
+    }
+
+
+    public static Bitmap getBitmapFromAsset(Context context,String strName){
+        AssetManager assetManager = context.getAssets();
+        InputStream in= null;
+        try {
+            in = assetManager.open(strName);
+        } catch (IOException e) {
+            Log.e(TAG, e.getMessage());
+        }
+        Bitmap bitmap = BitmapFactory.decodeStream(in);
+        return bitmap;
     }
 
 }

@@ -1,9 +1,25 @@
 package com.bowen.assignment.common;
 
+
 /**
  * Created by patrick on 2015-03-26.
  */
 public class Error {
+
+    public static final int UN_KNOW_HOST_CODE=1;
+
+    public static final String UN_KNOW_HOST_MESSAGE="un know host";
+
+    public static final String ERROR_MODEL_DOMAIN="model";
+
+    public static final int IO_ERROR_CODE=2;
+
+    public static final String IO_ERROR_MESSAGE="io error";
+
+    public static final int IO_ERROR_CLOSE_CODE=3;
+
+    public static final String IO_ERROR_CLOSE_MESSAGE="io close error";
+
 
     private int code;
 

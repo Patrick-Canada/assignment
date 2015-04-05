@@ -11,4 +11,5 @@
     <string name="user_fragment_tag">user_fragment_tag</string>
     <string name="map_fragment_tag">map_fragment_tag</string>
     <string name="user_config_info">user_config_info</string>
+    <string name="app_user_icons">user icons</string>
 </resources>

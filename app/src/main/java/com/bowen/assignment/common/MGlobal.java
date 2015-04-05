@@ -1,7 +1,15 @@
 package com.bowen.assignment.common;
 
+import android.app.AlertDialog;
 import android.content.Context;
+import android.content.DialogInterface;
 import android.content.SharedPreferences;
+import android.graphics.Color;
+import android.graphics.Typeface;
+import android.graphics.drawable.ColorDrawable;
+import android.view.Gravity;
+import android.widget.Button;
+import android.widget.TextView;
 
 import com.bowen.assignment.R;
 /**
@@ -12,6 +20,31 @@ public class MGlobal {
     public Context context;
 
     public static MGlobal global;
+
+    private String address;
+
+    private int port;
+
+
+    public String getAddress() {
+
+        return address;
+    }
+
+    public void setAddress(String address) {
+
+        this.address = address;
+    }
+
+    public int getPort() {
+
+        return port;
+    }
+
+    public void setPort(int port) {
+
+        this.port = port;
+    }
 
     private MGlobal(Context context){
 
@@ -24,6 +57,10 @@ public class MGlobal {
         if (global==null){
             global=new MGlobal(context.getApplicationContext());
         }
+
+        global.setAddress("192.168.0.17");
+
+        global.setPort(11000);
     }
 
     public static MGlobal getInstance(){
@@ -63,5 +100,43 @@ public class MGlobal {
 
         getUserConfigPreferences().edit().
                 putBoolean(MConstant.SHOW_USER_CONFIG_KEY,showUserIconConfig).commit();
+    }
+
+    public Typeface getNormalFont(){
+        Typeface normal= Typeface.createFromAsset(this.context.getAssets(), "HelveticaNeue.ttf");
+        return normal;
+    }
+
+
+    public void alert(String message,Context context){
+
+        if (context==null||message==null){
+            return;
+        }
+
+        TextView textView=new TextView(context);
+        textView.setPadding(10,10,10,10);
+        textView.setTypeface(getNormalFont());
+        textView.setText(message);
+
+        TextView titleView=new TextView(context);
+        titleView.setTextSize(20);
+        titleView.setText("Message");
+        titleView.setPadding(0,25,0,25);
+        titleView.setTypeface(getNormalFont());
+        titleView.setGravity(Gravity.CENTER);
+
+        AlertDialog dialog= new AlertDialog.Builder(context)
+                .setCustomTitle(titleView)
+                .setView(textView)
+                .setPositiveButton(android.R.string.yes, new DialogInterface.OnClickListener() {
+                    public void onClick(DialogInterface dialog, int which) {
+                        dialog.dismiss();
+                    }
+                }).show();
+        Button okButton=dialog.getButton(DialogInterface.BUTTON_POSITIVE);
+        okButton.setTypeface(getNormalFont());
+        okButton.setBackgroundDrawable(new ColorDrawable(Color.WHITE));
+        okButton.invalidate();
     }
 }
