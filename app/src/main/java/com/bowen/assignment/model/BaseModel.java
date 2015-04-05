@@ -3,7 +3,6 @@ import android.os.AsyncTask;
 import android.util.Log;
 
 import com.bowen.assignment.common.Error;
-import com.bowen.assignment.entity.Result;
 import com.google.gson.Gson;
 
 import java.io.BufferedReader;
