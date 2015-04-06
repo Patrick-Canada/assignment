@@ -5,8 +5,6 @@ android {
         google {
             keyAlias 'google'
             storeFile file('/Users/patrick/Downloads/google.jks')
-            keyPassword 'google82441557'
-            storePassword 'google82441557'
         }
     }
     compileSdkVersion 21
