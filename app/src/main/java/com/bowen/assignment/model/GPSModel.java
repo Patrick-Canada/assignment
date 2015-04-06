@@ -1,12 +1,20 @@
 package com.bowen.assignment.model;
+
+import android.util.Log;
+import com.bowen.assignment.entity.Result;
+import com.google.gson.Gson;
+
 /**
  * Created by patrick on 2015-03-26.
  */
 public class GPSModel extends BaseModel {
 
-    private final static String SAVE_GPS_METHOD="saveGpsInfo";
+    private final static String TAG="GPSModel";
+
+    private final static String SAVE_GPS_METHOD="saveGPSInfo";
 
     public GPSModel(String address, int port, String method){
+
         super(address,port,method);
     }
 
@@ -28,6 +36,14 @@ public class GPSModel extends BaseModel {
 
     @Override
     public void parseResult(String result){
-        super.parseResult(result);
+
+        Log.d(TAG, result);
+        Gson gson=new Gson();
+        Result r= gson.fromJson(result, Result.class);
+        if (this.getAction().equals(SAVE_GPS_METHOD)){
+            if (r.getSuccess().equals("true")){
+                Log.d(TAG,"save gps success");
+            }
+        }
     }
 }

@@ -49,14 +49,14 @@ public class UserModel extends BaseModel{
 
     @Override
     public void parseResult(String result){
-
         Log.d(TAG,result);
-
         Gson gson=new Gson();
         Result r= gson.fromJson(result, Result.class);
-        if (r.getSuccess().equals("true")){
-            MGlobal.getInstance().saveUserId(r.getResult());
-            Log.d(TAG,"success");
+        if (this.getAction().equals(ADD_USER_METHOD)){
+            if (r.getSuccess().equals("true")){
+                MGlobal.getInstance().saveUserId(r.getResult());
+                Log.d(TAG,"init user success");
+            }
         }
     }
 }

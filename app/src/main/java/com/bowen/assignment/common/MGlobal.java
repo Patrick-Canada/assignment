@@ -57,10 +57,6 @@ public class MGlobal {
         if (global==null){
             global=new MGlobal(context.getApplicationContext());
         }
-
-        global.setAddress("192.168.0.17");
-
-        global.setPort(11000);
     }
 
     public static MGlobal getInstance(){

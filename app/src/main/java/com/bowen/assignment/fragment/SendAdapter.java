@@ -28,7 +28,7 @@ public class SendAdapter extends ArrayAdapter<LocalServerVO> {
             view= LayoutInflater.from(getContext()).inflate(R.layout.network_cell, parent, false);
         }
         TextView textView=(TextView) view.findViewById(R.id.net_work_text_view);
-        textView.setText(vo.getName()+" "+vo.getIpAddress());
+        textView.setText(vo.getName());
         return view;
     }
 }

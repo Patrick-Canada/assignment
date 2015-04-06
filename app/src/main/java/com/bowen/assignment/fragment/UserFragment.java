@@ -189,7 +189,6 @@ public class UserFragment extends Fragment implements ModelDelegate{
     public void didFinishLoad(BaseModel model) {
 
         if (model instanceof UserModel){
-
             if (model.getAction().equals("initUser")){
                 String result=(String) model.getResults().get(0);
                 MGlobal.getInstance().saveUserId(result);

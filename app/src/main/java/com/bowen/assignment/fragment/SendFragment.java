@@ -15,10 +15,14 @@ import android.widget.ListView;
 import com.bowen.assignment.R;
 import com.bowen.assignment.common.*;
 import com.bowen.assignment.common.Error;
+import com.bowen.assignment.dao.MImageDao;
+import com.bowen.assignment.entity.ImageEntity;
 import com.bowen.assignment.model.BaseModel;
 import com.bowen.assignment.model.GPSModel;
 import com.bowen.assignment.model.ModelDelegate;
+import com.bowen.assignment.vo.GPSVO;
 import com.bowen.assignment.vo.LocalServerVO;
+import com.google.gson.Gson;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -40,7 +44,11 @@ public class SendFragment extends Fragment implements ModelDelegate{
 
     private ListView listView;
 
-    private final static String SERVICE_TYPE="_ssh._tcp.";
+    private MImageDao imageDao;
+
+    private NsdManager.ResolveListener resolveListener;
+
+    private final static String SERVICE_TYPE="_gps._tcp.";
 
     public void configBonjourBrowser(){
 
@@ -75,10 +83,8 @@ public class SendFragment extends Fragment implements ModelDelegate{
                 if (discoveryStart){
                     LocalServerVO serverVO=new LocalServerVO();
                     serverVO.setName(serviceInfo.getServiceName());
-                    serverVO.setIpAddress(serviceInfo.getHost()+" port:"+serviceInfo.getPort());
-
+                    serverVO.setServiceInfo(serviceInfo);
                     dataSource.add(serverVO);
-
                     activity.runOnUiThread(new Runnable() {
                         @Override
                         public void run() {
@@ -90,16 +96,15 @@ public class SendFragment extends Fragment implements ModelDelegate{
 
             @Override
             public void onServiceLost(NsdServiceInfo serviceInfo) {
-
                 Log.e(TAG, "service lost" + serviceInfo.getServiceName());
             }
         };
 
-        nsdManager = (NsdManager) getActivity().getSystemService(getActivity().NSD_SERVICE);
+        nsdManager = (NsdManager)getActivity().getApplicationContext().getSystemService(getActivity().NSD_SERVICE);
         nsdManager.discoverServices(SERVICE_TYPE, NsdManager.PROTOCOL_DNS_SD, browser);
 
+        this.initializeResolveListener();
     }
-
 
     private void refreshTable(){
 
@@ -107,27 +112,83 @@ public class SendFragment extends Fragment implements ModelDelegate{
     }
 
 
-    public void send(){
+    public void send(final LocalServerVO serverVO){
 
-        MGlobal global=MGlobal.getInstance();
-        if (global.getUserId().length()==0){
+        if (serverVO.getName().equals("Bowen")){
 
-            MGlobal.getInstance().alert("please choice a user icon",this.getActivity());
+            if (MGlobal.getInstance().getAddress()==null){
 
-            return;
+                nsdManager.resolveService(serverVO.getServiceInfo(),resolveListener);
+
+            }else{
+
+                MGlobal global=MGlobal.getInstance();
+                if (global.getUserId().length()==0){
+
+                    MGlobal.getInstance().alert("please choice a user icon",this.getActivity());
+
+                    return;
+                }
+                GPSModel gpsModel=GPSModel.initGPS(global.getAddress(),global.getPort(),
+                        global.getUserId(),getGPSData());
+                gpsModel.setDelegate(this);
+                gpsModel.startLoad();
+            }
         }
-        GPSModel gpsModel=GPSModel.initGPS(global.getAddress(),global.getPort(),
-                global.getUserId(),getGPSData());
-        gpsModel.setDelegate(this);
-        gpsModel.startLoad();
-
     }
+
+
+    public void setIPAddress(NsdServiceInfo serviceInfo){
+        for (LocalServerVO sv:this.dataSource){
+            if (sv.getName().equals(serviceInfo.getServiceName())){
+                sv.setIpAddress(serviceInfo.getHost().getHostAddress());
+                sv.setPort(serviceInfo.getPort());
+
+                MGlobal global=MGlobal.getInstance();
+                global.setAddress(sv.getIpAddress());
+                global.setPort(sv.getPort());
+                if (global.getUserId().length()==0){
+
+                    MGlobal.getInstance().alert("please choice a user icon",this.getActivity());
+                    return;
+                }
+                GPSModel gpsModel=GPSModel.initGPS(global.getAddress(),global.getPort(),
+                        global.getUserId(),getGPSData());
+                gpsModel.setDelegate(this);
+                gpsModel.startLoad();
+            }
+        }
+    }
+
+    public void initializeResolveListener() {
+        resolveListener = new NsdManager.ResolveListener() {
+            @Override
+            public void onResolveFailed(NsdServiceInfo serviceInfo, int errorCode) {
+                Log.e(TAG, "Resolve failed" + errorCode);
+            }
+            @Override
+            public void onServiceResolved(NsdServiceInfo serviceInfo) {
+                Log.e(TAG, "Resolve Succeeded. " + serviceInfo);
+                setIPAddress(serviceInfo);
+            }
+        };
+    }
+
 
 
     //to do
     public String getGPSData(){
-
-        return "";
+        List<ImageEntity> entities= imageDao.getAllImages();
+        List<GPSVO> gpsvos=new ArrayList<>();
+        for (ImageEntity entity:entities){
+            GPSVO gpsvo=new GPSVO();
+            gpsvo.setX(entity.getX());
+            gpsvo.setY(entity.getY());
+            gpsvos.add(gpsvo);
+        }
+        Gson gson=new Gson();
+        String result= gson.toJson(gpsvos);
+        return result;
     }
 
 
@@ -152,11 +213,19 @@ public class SendFragment extends Fragment implements ModelDelegate{
         listView.setOnItemClickListener(new AdapterView.OnItemClickListener() {
             @Override
             public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
-              send();
+                LocalServerVO serverVO=dataSource.get(position);
+                send(serverVO);
             }
         });
 
         this.configBonjourBrowser();
+
+        imageDao = new MImageDao(this.getActivity());
+        try{
+            imageDao.open();
+        }catch (Exception SQLException){
+            Log.e(TAG,"SQLException");
+        }
 
         listView.setAdapter(new SendAdapter(this.getActivity(),dataSource));
         return view;
@@ -178,6 +247,12 @@ public class SendFragment extends Fragment implements ModelDelegate{
     public void onPause(){
 
         super.onPause();
+    }
+
+
+    public void onDestroy(){
+        imageDao.close();
+        super.onDestroy();
     }
 
 
