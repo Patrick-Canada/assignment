@@ -165,23 +165,45 @@ public class UserFragment extends Fragment implements ModelDelegate{
             FileUtil.saveImageToInternalStorage(smallIcon,MConstant.USER_ICON_SMALL_FILE_NAME);
             setActionLogo();
             if (MGlobal.getInstance().getUserId().length()==0){
-
-                UserModel userModel=UserModel.initUser(MGlobal.getInstance().getAddress(),
-                        MGlobal.getInstance().getPort(),
-                        getIconName(iconUrl));
-                userModel.setDelegate(this);
-                userModel.startLoad();
+                doAddUser(iconUrl);
             }else{
-
-                UserModel userModel=UserModel.updateUser(
-                        MGlobal.getInstance().getAddress(),
-                        MGlobal.getInstance().getPort(),
-                        MGlobal.getInstance().getUserId(),
-                        getIconName(iconUrl));
-                userModel.setDelegate(this);
-                userModel.startLoad();
+                doUpdateUser(MGlobal.getInstance().getUserId(),iconUrl);
             }
         }
+    }
+
+
+    /**
+     * send to server side
+     * @param userId
+     * @param iconType
+     */
+    public void doUpdateUser(String userId, String iconType){
+
+        /**
+        UserModel userModel=UserModel.updateUser(
+                MGlobal.getInstance().getAddress(),
+                MGlobal.getInstance().getPort(),
+                MGlobal.getInstance().getUserId(),
+                getIconName(iconType));
+        userModel.setDelegate(this);
+        userModel.startLoad();**/
+
+    }
+
+
+    /**
+     * send to server side
+     * @param iconType
+     */
+    public void doAddUser(String iconType){
+        /**
+        UserModel userModel=UserModel.initUser(MGlobal.getInstance().getAddress(),
+                MGlobal.getInstance().getPort(),
+                getIconName(iconType));
+        userModel.setDelegate(this);
+        userModel.startLoad();**/
+
     }
 
 

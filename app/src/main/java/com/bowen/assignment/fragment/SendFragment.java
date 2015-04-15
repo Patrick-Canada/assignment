@@ -97,6 +97,11 @@ public class SendFragment extends Fragment implements ModelDelegate{
             @Override
             public void onServiceLost(NsdServiceInfo serviceInfo) {
                 Log.e(TAG, "service lost" + serviceInfo.getServiceName());
+                for (LocalServerVO serverVO:dataSource){
+                    if (serverVO.getName().equals(serviceInfo.getServiceName())){
+                        dataSource.remove(serverVO);
+                    }
+                }
             }
         };
 
@@ -112,6 +117,10 @@ public class SendFragment extends Fragment implements ModelDelegate{
     }
 
 
+    /**
+     * this method send gps data to server
+     * @param serverVO
+     */
     public void send(final LocalServerVO serverVO){
 
         if (serverVO.getName().equals("Bowen")){
@@ -129,15 +138,30 @@ public class SendFragment extends Fragment implements ModelDelegate{
 
                     return;
                 }
-                GPSModel gpsModel=GPSModel.initGPS(global.getAddress(),global.getPort(),
-                        global.getUserId(),getGPSData());
-                gpsModel.setDelegate(this);
-                gpsModel.startLoad();
+                doSend(getGPSData());
             }
         }
     }
 
 
+    /**
+     * change new send logic at here
+     * @param gpsData
+     */
+    private void doSend(String gpsData){
+        /**
+        MGlobal global=MGlobal.getInstance();
+        GPSModel gpsModel=GPSModel.initGPS(global.getAddress(),global.getPort(),
+                global.getUserId(),getGPSData());
+        gpsModel.setDelegate(this);
+        gpsModel.startLoad();**/
+    }
+
+
+    /**
+     * this method send gps data to server
+     * @param serviceInfo
+     */
     public void setIPAddress(NsdServiceInfo serviceInfo){
         for (LocalServerVO sv:this.dataSource){
             if (sv.getName().equals(serviceInfo.getServiceName())){
@@ -147,15 +171,13 @@ public class SendFragment extends Fragment implements ModelDelegate{
                 MGlobal global=MGlobal.getInstance();
                 global.setAddress(sv.getIpAddress());
                 global.setPort(sv.getPort());
-                if (global.getUserId().length()==0){
 
+                if (global.getUserId().length()==0){
                     MGlobal.getInstance().alert("please choice a user icon",this.getActivity());
                     return;
                 }
-                GPSModel gpsModel=GPSModel.initGPS(global.getAddress(),global.getPort(),
-                        global.getUserId(),getGPSData());
-                gpsModel.setDelegate(this);
-                gpsModel.startLoad();
+
+                this.doSend(getGPSData());
             }
         }
     }
