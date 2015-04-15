@@ -165,9 +165,9 @@ public class UserFragment extends Fragment implements ModelDelegate{
             FileUtil.saveImageToInternalStorage(smallIcon,MConstant.USER_ICON_SMALL_FILE_NAME);
             setActionLogo();
             if (MGlobal.getInstance().getUserId().length()==0){
-                doAddUser(iconUrl);
+                doAddUser(getIconName(iconUrl));
             }else{
-                doUpdateUser(MGlobal.getInstance().getUserId(),iconUrl);
+                doUpdateUser(MGlobal.getInstance().getUserId(),getIconName(iconUrl));
             }
         }
     }
@@ -185,7 +185,7 @@ public class UserFragment extends Fragment implements ModelDelegate{
                 MGlobal.getInstance().getAddress(),
                 MGlobal.getInstance().getPort(),
                 MGlobal.getInstance().getUserId(),
-                getIconName(iconType));
+                iconType);
         userModel.setDelegate(this);
         userModel.startLoad();**/
 
@@ -200,7 +200,7 @@ public class UserFragment extends Fragment implements ModelDelegate{
         /**
         UserModel userModel=UserModel.initUser(MGlobal.getInstance().getAddress(),
                 MGlobal.getInstance().getPort(),
-                getIconName(iconType));
+                iconType);
         userModel.setDelegate(this);
         userModel.startLoad();**/
 
