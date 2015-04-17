@@ -27,7 +27,7 @@ public class MImageDao {
         dbHelper = new MImageDBHelper(context);
     }
 
-    public void open() throws SQLException {
+    public void open(){
         database = dbHelper.getWritableDatabase();
     }
 
@@ -36,6 +36,7 @@ public class MImageDao {
     }
 
     public ImageEntity createImageEntity(ImageEntity imageEntity) {
+        this.open();
         ContentValues values = new ContentValues();
         values.put(MImageDBHelper.COLUMN_GPS_X, imageEntity.getX());
         values.put(MImageDBHelper.COLUMN_GPS_Y,imageEntity.getY());
@@ -50,6 +51,7 @@ public class MImageDao {
         cursor.moveToFirst();
         ImageEntity image =cursorToImage(cursor);
         cursor.close();
+        this.close();
         return image;
     }
 
@@ -65,6 +67,7 @@ public class MImageDao {
     }
 
     public List<ImageEntity> getAllImages() {
+        this.open();
         List<ImageEntity> imageEntities = new ArrayList<>();
 
         Cursor cursor = database.query(MImageDBHelper.TABLE_IMAGE,
@@ -77,6 +80,7 @@ public class MImageDao {
             cursor.moveToNext();
         }
         cursor.close();
+        this.close();
         return imageEntities;
     }
 }

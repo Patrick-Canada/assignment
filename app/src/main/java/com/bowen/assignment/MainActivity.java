@@ -1,4 +1,5 @@
 package com.bowen.assignment;
+import android.app.Activity;
 import android.content.Intent;
 import android.graphics.Bitmap;
 import android.location.Criteria;
@@ -23,6 +24,7 @@ import com.bowen.assignment.dao.MImageDao;
 import com.bowen.assignment.entity.ImageEntity;
 import com.bowen.assignment.fragment.SendFragment;
 import com.bowen.assignment.fragment.UserFragment;
+import com.bowen.assignment.vo.GPSVO;
 import com.google.android.gms.maps.CameraUpdate;
 import com.google.android.gms.maps.CameraUpdateFactory;
 import com.google.android.gms.maps.GoogleMap;
@@ -31,6 +33,15 @@ import com.google.android.gms.maps.model.BitmapDescriptorFactory;
 import com.google.android.gms.maps.model.LatLng;
 import com.google.android.gms.maps.model.Marker;
 import com.google.android.gms.maps.model.MarkerOptions;
+import com.google.gson.Gson;
+import com.parse.GetCallback;
+import com.parse.Parse;
+import com.parse.ParseACL;
+import com.parse.ParseException;
+import com.parse.ParseObject;
+import com.parse.ParseQuery;
+import com.parse.ParseUser;
+import com.parse.SaveCallback;
 
 import java.util.ArrayList;
 import java.util.Date;
@@ -64,6 +75,12 @@ public class MainActivity extends ActionBarActivity implements LocationListener{
     private MImageDao imageDao;
 
     private LocationManager locationManager;
+
+
+    protected void configParseLib(){
+        Parse.enableLocalDatastore(this);
+        Parse.initialize(this,getString(R.string.parse_app_id),getString(R.string.parse_client_key));
+    }
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -131,6 +148,8 @@ public class MainActivity extends ActionBarActivity implements LocationListener{
     }
 
     private void configEnvironment(){
+
+        configParseLib();
 
         MGlobal.init(this);
 
@@ -245,11 +264,75 @@ public class MainActivity extends ActionBarActivity implements LocationListener{
             imageEntity.setName("");
             imageDao.createImageEntity(imageEntity);
             FileUtil.saveFile(imageBitmap, fileName);
+            doSendGPS();
             refreshIcons();
         }
         super.onActivityResult(requestCode,resultCode,data);
 
     }
+
+
+    protected String getGPSData(){
+        List<ImageEntity> entities= imageDao.getAllImages();
+        List<GPSVO> gpsvos=new ArrayList<>();
+        for (ImageEntity entity:entities){
+            GPSVO gpsvo=new GPSVO();
+            gpsvo.setX(entity.getX());
+            gpsvo.setY(entity.getY());
+            gpsvos.add(gpsvo);
+        }
+        Gson gson=new Gson();
+        String result= gson.toJson(gpsvos);
+        return result;
+    }
+
+    protected void doSendGPS(){
+
+        final String gpsData=getGPSData();
+
+        final Activity activity=this;
+        if(MGlobal.getInstance().getGPSId().length()>0){
+            ParseQuery<ParseObject> query = ParseQuery.getQuery("GPS");
+            query.getInBackground(MGlobal.getInstance().getGPSId(),
+                    new GetCallback<ParseObject>() {
+                        public void done(ParseObject user, ParseException e) {
+                            if (e == null) {
+                                user.put("userId", MGlobal.getInstance().getUserId());
+                                user.put("gps",gpsData);
+                                user.saveInBackground(new SaveCallback() {
+                                    @Override
+                                    public void done(ParseException e) {
+                                        if (e==null){
+                                            MGlobal.getInstance().alert("send gps data success",
+                                                    activity);
+                                        }else{
+                                            MGlobal.getInstance().alert(e.getMessage(),activity);
+                                        }
+                                    }
+                                });
+                            }else{
+                                MGlobal.getInstance().alert(e.getMessage(),activity);
+                            }
+                        }
+                    });
+        }else{
+            final ParseObject gps=new ParseObject("GPS");
+            gps.put("userId",MGlobal.getInstance().getUserId());
+            gps.put("gps",gpsData);
+            gps.saveInBackground(new SaveCallback() {
+                @Override
+                public void done(ParseException e) {
+                    if (e!=null){
+                        MGlobal.getInstance().alert(e.getMessage(),activity);
+                    }else{
+                        MGlobal.getInstance().saveGPSId(gps.getObjectId());
+                        MGlobal.getInstance().alert("send gps data success",activity);
+                    }
+                }
+            });
+        }
+    }
+
 
 
     public void goImagesActivity(){

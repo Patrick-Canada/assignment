@@ -12,4 +12,6 @@ public class MConstant {
     public final static String USER_ICON_SMALL_FILE_NAME="default_user_icon_small_name.png";
 
     public final static String USER_ID_KEY="USER_ID";
+
+    public final static String GPS_ID_KEY="GPS_ID";
 }

@@ -18,11 +18,15 @@ import com.bowen.assignment.common.Error;
 import com.bowen.assignment.dao.MImageDao;
 import com.bowen.assignment.entity.ImageEntity;
 import com.bowen.assignment.model.BaseModel;
-import com.bowen.assignment.model.GPSModel;
 import com.bowen.assignment.model.ModelDelegate;
 import com.bowen.assignment.vo.GPSVO;
 import com.bowen.assignment.vo.LocalServerVO;
 import com.google.gson.Gson;
+import com.parse.GetCallback;
+import com.parse.ParseException;
+import com.parse.ParseObject;
+import com.parse.ParseQuery;
+import com.parse.SaveCallback;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -148,13 +152,54 @@ public class SendFragment extends Fragment implements ModelDelegate{
      * change new send logic at here
      * @param gpsData
      */
-    private void doSend(String gpsData){
+    private void doSend(final String gpsData){
         /**
         MGlobal global=MGlobal.getInstance();
         GPSModel gpsModel=GPSModel.initGPS(global.getAddress(),global.getPort(),
                 global.getUserId(),getGPSData());
         gpsModel.setDelegate(this);
         gpsModel.startLoad();**/
+
+        if(MGlobal.getInstance().getGPSId().length()>0){
+            ParseQuery<ParseObject> query = ParseQuery.getQuery("GPS");
+            query.getInBackground(MGlobal.getInstance().getGPSId(),
+                    new GetCallback<ParseObject>() {
+                public void done(ParseObject user, ParseException e) {
+                    if (e == null) {
+                        user.put("userId", MGlobal.getInstance().getUserId());
+                        user.put("gps",gpsData);
+                        user.saveInBackground(new SaveCallback() {
+                            @Override
+                            public void done(ParseException e) {
+                                if (e==null){
+                                    MGlobal.getInstance().alert("send gps data success",
+                                            getActivity());
+                                }else{
+                                    MGlobal.getInstance().alert(e.getMessage(),getActivity());
+                                }
+                            }
+                        });
+                    }else{
+                        MGlobal.getInstance().alert(e.getMessage(),getActivity());
+                    }
+                }
+            });
+        }else{
+            final ParseObject gps=new ParseObject("GPS");
+            gps.put("userId",MGlobal.getInstance().getUserId());
+            gps.put("gps",gpsData);
+            gps.saveInBackground(new SaveCallback() {
+                @Override
+                public void done(ParseException e) {
+                    if (e!=null){
+                        MGlobal.getInstance().alert(e.getMessage(),getActivity());
+                    }else{
+                        MGlobal.getInstance().saveGPSId(gps.getObjectId());
+                        MGlobal.getInstance().alert("send gps data success",getActivity());
+                    }
+                }
+            });
+        }
     }
 
 

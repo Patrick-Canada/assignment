@@ -12,4 +12,7 @@
     <string name="map_fragment_tag">map_fragment_tag</string>
     <string name="user_config_info">user_config_info</string>
     <string name="app_user_icons">user icons</string>
+    <string name="google_api_key">AIzaSyDCyr3kRUlwBO4zCafMwgyzb9WgdmC7P44</string>
+    <string name="parse_app_id">NtCaEOWu2XBFQEx8VL1ngSYl7RreLy9OLPteaIC7</string>
+    <string name="parse_client_key">DtP2OY9ljznunxaXbQ8cnc0sDP8EdnRO5S38KPVo</string>
 </resources>

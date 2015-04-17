@@ -23,6 +23,12 @@ import com.bowen.assignment.common.Error;
 import com.bowen.assignment.model.BaseModel;
 import com.bowen.assignment.model.ModelDelegate;
 import com.bowen.assignment.model.UserModel;
+import com.parse.GetCallback;
+import com.parse.Parse;
+import com.parse.ParseException;
+import com.parse.ParseObject;
+import com.parse.ParseQuery;
+import com.parse.SaveCallback;
 
 import java.io.IOException;
 import java.io.InputStream;
@@ -178,7 +184,7 @@ public class UserFragment extends Fragment implements ModelDelegate{
      * @param userId
      * @param iconType
      */
-    public void doUpdateUser(String userId, String iconType){
+    public void doUpdateUser(String userId, final String iconType){
 
         /**
         UserModel userModel=UserModel.updateUser(
@@ -188,7 +194,17 @@ public class UserFragment extends Fragment implements ModelDelegate{
                 iconType);
         userModel.setDelegate(this);
         userModel.startLoad();**/
-
+        ParseQuery<ParseObject> query = ParseQuery.getQuery("User");
+        query.getInBackground(userId, new GetCallback<ParseObject>() {
+            public void done(ParseObject user, ParseException e) {
+                if (e == null) {
+                    user.put("iconType", iconType);
+                    user.saveInBackground();
+                }else{
+                    MGlobal.getInstance().alert(e.getMessage(),getActivity());
+                }
+            }
+        });
     }
 
 
@@ -203,7 +219,19 @@ public class UserFragment extends Fragment implements ModelDelegate{
                 iconType);
         userModel.setDelegate(this);
         userModel.startLoad();**/
-
+        final ParseObject user=new ParseObject("User");
+        user.put("iconType",iconType);
+        user.saveInBackground(new SaveCallback() {
+            @Override
+            public void done(ParseException e) {
+                if (e!=null){
+                    MGlobal.getInstance().alert(e.getMessage(),getActivity());
+                }else{
+                    String userId= user.getObjectId();
+                    MGlobal.getInstance().saveUserId(userId);
+                }
+            }
+        });
     }
 
 

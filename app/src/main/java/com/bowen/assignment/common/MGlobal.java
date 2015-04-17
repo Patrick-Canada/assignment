@@ -92,6 +92,17 @@ public class MGlobal {
         getUserConfigPreferences().edit().putString(MConstant.USER_ID_KEY,id).commit();
     }
 
+    public String getGPSId(){
+
+        return getUserConfigPreferences().getString(MConstant.GPS_ID_KEY,"");
+    }
+
+
+    public void saveGPSId(String id){
+
+        getUserConfigPreferences().edit().putString(MConstant.GPS_ID_KEY,id).commit();
+    }
+
     public void setShowUserIconConfig(boolean showUserIconConfig) {
 
         getUserConfigPreferences().edit().

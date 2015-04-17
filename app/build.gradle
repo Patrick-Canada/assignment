@@ -4,9 +4,7 @@ android {
     signingConfigs {
         google {
             keyAlias 'google'
-            storeFile file('/Users/patrick/Downloads/google.jks')
-            keyPassword 'google82441557'
-            storePassword 'google82441557'
+            storeFile file('/Users/gen/Downloads/google.jks')
         }
     }
     compileSdkVersion 21
@@ -37,4 +35,5 @@ dependencies {
     compile 'com.android.support:appcompat-v7:21.0.2'
     compile 'com.google.android.gms:play-services-maps:6.+'
     compile 'com.google.code.gson:gson:2.2.+'
+    compile 'com.parse.bolts:bolts-android:1.1.4'
 }
